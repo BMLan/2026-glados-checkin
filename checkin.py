@@ -167,6 +167,25 @@ def pushplus(token, title, content):
     except:
         log("❌ PushPlus 推送失败")
 
+def telegram_push(token, chat_id, title, content):
+    if not token or not chat_id: return
+    try:
+        url = f"https://api.telegram.org/bot{token}/sendMessage"
+        # Convert some html to text or use HTML parse mode. Telegram supports limited HTML.
+        text = f"<b>{title}</b>\n\n{content}"
+        # Telegram HTML doesn't support <div>, <p>, <br> well. Let's send basic text format or stripped html.
+        # But to keep it simple, we just use HTML mode and replace <br> with \n, and strip out other tags or let standard msg send
+        text = text.replace("<br>", "\n").replace("<p>", "").replace("</p>", "\n").replace("<div>", "").replace("</div>", "\n").replace("<h3>", "<b>").replace("</h3>", "</b>\n")
+        data = {
+            "chat_id": chat_id,
+            "text": text,
+            "parse_mode": "HTML"
+        }
+        requests.post(url, json=data, timeout=5)
+        log("✅ Telegram 推送成功")
+    except Exception as e:
+        log(f"❌ Telegram 推送失败: {e}")
+
 def main():
     log("🚀 2026 GLaDOS Checkin Starting...")
     cookies = get_cookies()
@@ -207,19 +226,25 @@ def main():
 """)
 
     # Push
+    push_level = os.environ.get("PUSH_LEVEL", "all").lower()
+    
+    if push_level == "fail_only" and success_cnt == len(cookies):
+        log("⏭️ 根据 PUSH_LEVEL=fail_only 设置，所有账号签到成功，跳过推送")
+        return
+
     ptoken = os.environ.get("PUSHPLUS_TOKEN")
-    if ptoken:
-        # Get first user's points for title
-        first_points = "多账户"
-        if len(cookies) == 1:
-            # Re-parse log to find points? Or just use last object
-            # Ideally store objects. Using simplified approach:
-            pass 
-        
+    tg_token = os.environ.get("TELEGRAM_BOT_TOKEN")
+    tg_chat_id = os.environ.get("TELEGRAM_CHAT_ID")
+    
+    if ptoken or (tg_token and tg_chat_id):
         title = f"GLaDOS签到: 成功{success_cnt}/{len(cookies)}"
         content = "".join(results)
         content += f"<br><small>时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</small>"
-        pushplus(ptoken, title, content)
+        
+        if ptoken:
+            pushplus(ptoken, title, content)
+        if tg_token and tg_chat_id:
+            telegram_push(tg_token, tg_chat_id, title, content)
 
 if __name__ == '__main__':
     main()

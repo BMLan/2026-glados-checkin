@@ -82,7 +82,6 @@ in
       timerConfig = {
         OnCalendar = [
           "*-*-* 09:30:00"
-          "*-*-* 21:30:00"
         ];
         RandomizedDelaySec = "10m";
         Persistent = true;

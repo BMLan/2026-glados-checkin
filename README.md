@@ -1,5 +1,12 @@
 # 🎁 5 分钟配置 GLaDOS 自动签到
 
+> [!IMPORTANT]
+> **2026-09-30：新版认证修复已发布。** 维护者仓库已验证签到与 PushPlus 通知正常，[查看修复公告和实测记录](https://github.com/lankerr/2026-glados-checkin/releases/tag/v2026.9.30)。
+>
+> Fork 用户请先 **Sync fork → Update branch**。旧会话需要重新登录并更新 `GLADOS_COOKIE`（包含 `gld:sess` 与 `gld:sess.sig`），同时确认 `GLADOS_USER_AGENT` 与登录浏览器匹配。同步代码不会更新个人仓库的 Secrets 和 Variables；请手动运行一次验证自己的配置。
+>
+> 希望收到后续修复公告，可在原仓库选择 **Watch → Custom → Releases**。Fork 本身不代表订阅更新通知。
+
 <div align="center">
 
 **你不用写代码 · 不用买服务器 · 不用每天登录**
